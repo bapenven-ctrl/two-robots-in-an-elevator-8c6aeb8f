@@ -22,9 +22,13 @@ def main() -> None:
     if not 1 <= len(TEXT) <= 200:
         raise SystemExit("entry text must be 1-200 characters")
     os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8", newline="") as f:
-        f.write(TEXT)
-    os.chmod("/output/entry.txt", 0o644)
+    # Mode berkas 0644 dijamin lewat umask (catatan-lapangan E87/E88).
+    old_umask = os.umask(0o022)
+    try:
+        with open("/output/entry.txt", "w", encoding="utf-8", newline="") as f:
+            f.write(TEXT)
+    finally:
+        os.umask(old_umask)
 
 
 if __name__ == "__main__":
